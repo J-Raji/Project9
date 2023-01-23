@@ -48,7 +48,12 @@ or
 3. Click "Configure" your job/project and add these two configurations
 Configure triggering the job from GitHub webhook:
 
-- Github hook trigger on GITSCR polling
 
 - Archive the artifact on Post Actions
 ![saved and applied](post.png)
+
+-confirm build
+![confirm update of project in Jenkins](build.png)
+
+## Configure Jenkins to copy files to NFS server via SSH
+1. Install "Publish Over SSH" plugin.
