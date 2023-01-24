@@ -33,6 +33,7 @@ You will be prompted to provide a default admin password
 or
 `sudo vi /var/lib/jenkins/secrets/initialAdminPassword`
  d84735f4243e4faf8ea684558518804e
+ NEW PASSWORD: 123456#
 ![jenkins logged in](site.png)
 -Setup Username admin and password as above
 ![jenkins user setup](setup.png)
@@ -102,3 +103,20 @@ ec2-18-231-189-79.sa-east-1.compute.amazonaws.com
 - Username – ec2-user (since NFS server is based on EC2 with RHEL 8)
     
 - Remote directory – /mnt/apps since our Web Servers use it as a mointing point to retrieve files from the NFS server
+
+-Ubuntu do-release-upgrade
+`sudo do-release-upgrade`
+![Ubuntu upgrade](do-release-upgrade.png)
+-Upgrade complete
+![completed](upgraded.png)
+
+
+Jenkins API Token: 112be6335f77896d074cb7090fae6e05ea
+
+Github ID: bccaf954-498d-4841-98f3-c8e51b81452d
+Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
+![Git APi created](GitApi.png)
+
+![app setting for tooling-git](tooling-git.png)
+
+
