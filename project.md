@@ -102,10 +102,3 @@ ec2-18-231-189-79.sa-east-1.compute.amazonaws.com
 - Username – ec2-user (since NFS server is based on EC2 with RHEL 8)
     
 - Remote directory – /mnt/apps since our Web Servers use it as a mointing point to retrieve files from the NFS server
-
--Ubuntu do-release-upgrade
-`sudo do-release-upgrade`
-![ubuntu upgrade](do-release-upgrade.png)
-
--Ubuntu do-release-upgrade
-![ubuntu upgrade](upgraded.png)
