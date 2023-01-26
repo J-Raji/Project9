@@ -102,3 +102,6 @@ ec2-18-231-189-79.sa-east-1.compute.amazonaws.com
 - Username – ec2-user (since NFS server is based on EC2 with RHEL 8)
     
 - Remote directory – /mnt/apps since our Web Servers use it as a mointing point to retrieve files from the NFS server
+
+-Install Publish Over SSH pluggin
+-Configure Post-Build -Send artifacts over ssh
