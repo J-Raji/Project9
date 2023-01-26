@@ -105,3 +105,6 @@ ec2-18-231-189-79.sa-east-1.compute.amazonaws.com
 
 -Install Publish Over SSH pluggin
 -Configure Post-Build -Send artifacts over ssh
+-Run 
+`sudo chmod 777 /mnt/apps`
+`sudo chown nobody:nobody /mnt/apps
