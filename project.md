@@ -272,3 +272,6 @@ Enable proxy compactibility
 ![proxy set](crumb-proxy.png)
 Publish over ssh done
 ![test success](success.png)
+
+`sudo cat /mnt/apps/README.md`
+![access README.md](readme.png)
