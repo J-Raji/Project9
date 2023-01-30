@@ -119,5 +119,16 @@ Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
 
 ![app setting for tooling-git](tooling-git.png)
 
-
+-Blocker found
+![error 403 created](blocker.png)
+-Resolved
+1. Makesure the jenkins github plugin is installed in jenkins
+2. In your jenkins build job click the github hook trigger for GITScm polling checkbox
+    do not choose the Trigger builds remotely option
+3. Create a jenkins API for the user with rights to run the build job
+4. In Github, create a webhook to trigger the jenkins github plugin
+5. Set the Github payload as <jenkin_url>/github-webhook
+6. Set the Jenkins API Token as the webhook's secret token
+7. Save the GitHUb webhook configuration watch Jenkins builds run without 403
+no crumb errors.
 
