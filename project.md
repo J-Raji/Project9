@@ -33,7 +33,6 @@ You will be prompted to provide a default admin password
 or
 `sudo vi /var/lib/jenkins/secrets/initialAdminPassword`
  d84735f4243e4faf8ea684558518804e
- NEW PASSWORD: 123456#
 ![jenkins logged in](site.png)
 -Setup Username admin and password as above
 ![jenkins user setup](setup.png)
@@ -122,13 +121,154 @@ Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
 -Blocker found
 ![error 403 created](blocker.png)
 -Resolved
-1. Makesure the jenkins github plugin is installed in jenkins
-2. In your jenkins build job click the github hook trigger for GITScm polling checkbox
-    do not choose the Trigger builds remotely option
-3. Create a jenkins API for the user with rights to run the build job
-4. In Github, create a webhook to trigger the jenkins github plugin
-5. Set the Github payload as <jenkin_url>/github-webhook
-6. Set the Jenkins API Token as the webhook's secret token
-7. Save the GitHUb webhook configuration watch Jenkins builds run without 403
-no crumb errors.
+1. Launch NFS instance on Rhel 8.
+`ssh -i "nfskey.pem" ec2-user@ec2-52-67-48-33.sa-east-1.compute.amazonaws.com`
+![Rhel 8](rhel-nfs.png)
+`lsblk`
+![lsblk run](list.png)
+`df -h`
+![df -h run](ldf-h1.png)
 
+`sudo gdisk /dev/xvdf`
+`sudo gdisk /dev/xvdg`
+`sudo gdisk /dev/xvdh`
+
+-type p -next n with 8e00 -w -y
+`lsblk`
+![lsblk run](newpart.png)
+
+Install lvm2 
+`sudo yum install lvm2`
+![llvm2 run](lvm2-new.png)
+`sudo lvmdiskscan`
+![lvmdiskscan run](lvmscan.png)
+
+Make  physical volumes
+`sudo pvcreate /dev/xvdf1` 
+`sudo pvcreate /dev/xvdg1` 
+`sudo pvcreate /dev/xvdh1`
+`sudo pvs`
+![pvs run](pvs2.png)
+
+Volume Groups
+`sudo vgcreate nfsdata-vg /dev/xvdh1 /dev/xvdg1 /dev/xvdf1`
+Verify 
+`sudo vgs`
+Create
+`sudo lvcreate -n lv-opt -L 14G nfsdata-vg`
+`sudo lvcreate -n lv-apps -L 14G nfsdata-vg`
+`sudo lvcreate -n lv-logs -L 14G nfsdata-vg`
+
+Confirm Logical volumes 
+`sudo lvs`
+![lvs run](lvs2.png)
+
+Verify entire setup 
+`sudo vgdisplay -v` #view complete setup - VG, PV, and LV
+![see all](vgdisplay.png)
+![see all](vgdisplay1.png)
+![see all](vgdisplay2.png)
+
+Run `lsblk`
+![lsblk run](lsblk3.png)
+
+Format the LV with xfs filesystem 
+`sudo mkfs -t xfs /dev/nfsdata-vg/lv-opt`
+`sudo mkfs -t xfs /dev/nfsdata-vg/lv-apps`
+`sudo mkfs -t xfs /dev/nfsdata-vg/lv-logs`
+
+Rename vg nfsdata-vg to webdata-vg 
+`sudo vgrename nfsdata-vg webdata-vg`
+
+Make directory
+`sudo mkdir /mnt && cd /mnt`
+Create /mnt/apps to be used by webservers 
+`sudo mkdir -p /mnt/apps` 
+
+Create /mnt/logs to be used by webserver logs 
+`sudo mkdir -p /mnt/logs`
+
+Create /mnt/opt to be used by Jenkins server 
+`sudo mkdir -p /mnt/opt`
+
+Mount lv-app on /mnt/apps – To be used by webservers 
+`sudo mount /dev/webdata-vg/lv-apps /mnt/apps` 
+
+Mount lv-logs on /mnt/logs – To be used by webserver logs 
+`sudo mount /dev/webdata-vg/lv-logs /mnt/logs` 
+
+Mount lv-opt on /mnt/opt – To be used by Jenkins server in Project 8
+`sudo mount /dev/webdata-vg/lv-logs /mnt/opt` 
+
+
+Install NFS server, configure it to start on reboot and make sure it is u and running
+`sudo yum -y update`
+`sudo yum install nfs-utils -y`
+![nfs-utils](yum-ut.png)
+`sudo systemctl start nfs-server.service` 
+`sudo systemctl enable nfs-server.service`
+`sudo systemctl status nfs-server.service`
+![nfs- service](nfs-systemctl.png)
+
+Confirm Subnet link to cidr 
+![cidr](subnet-link.png)
+
+Make sure we set up permission that will allow our Web servers to read, write and execute files on NFS:
+
+`sudo chown -R nobody: /mnt/apps `
+`sudo chown -R nobody: /mnt/logs` 
+`sudo chown -R nobody: /mnt/opt`
+
+`sudo chmod -R 777 /mnt/apps` 
+`sudo chmod -R 777 /mnt/logs` 
+`sudo chmod -R 777 /mnt/opt`
+
+`sudo systemctl restart nfs-server.service`
+
+Sync 
+`sudo rsync /mnt/logs` 
+`sudo rsync /mnt/apps` 
+`sudo rsync /mnt/opt`
+
+Configure access to NFS for clients within the same subnet (example of Subnet CIDR – 172.31.0.0/20 ):
+
+`sudo vi /etc/exports`
+
+/mnt/apps <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash) 
+/mnt/logs <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash) 
+/mnt/opt <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash)
+
+Esc + :wq!
+
+`sudo exportfs -arv`
+
+Check which port is used by NFS and open it using Security Groups (add new Inbound Rule)
+`rpcinfo -p | grep nfs`
+![rpcinfo](rpcinfo.png)
+
+[Jenkins](http://18.230.184.147:8080)
+
+Modification the job/project to copy artifacts over to NFS server.
+
+On main dashboard select "Manage Jenkins" and choose "Configure System" menu item.
+
+Scroll down to Publish over SSH plugin configuration section and configure it to be able to connect to your NFS server:
+
+    Provide a private key (content of .pem file that you use to connect to NFS server via SSH/Putty)
+    nfskey content
+
+    Arbitrary name
+    NFS
+
+    Hostname – can be private IP address of your NFS server
+    172.31.12.167
+
+    Username – ec2-user (since NFS server is based on EC2 with RHEL 8)
+    Remote directory – /mnt/apps since our Web Servers use it as a mointing point to retrieve files from the NFS server
+
+In Configure Global Security > CSRF Protection
+Crumb Issuer(Default Crumb Issuer)
+Enable proxy compactibility
+![proxy set](crumb-proxy.png)
+Publish over ssh done
+![test success](success.png)
