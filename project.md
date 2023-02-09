@@ -1,27 +1,27 @@
 # Continuous Integration Pipeline with Jenkins Server
 1. Install and Configure Jenkins
 **Create instance in south africa region**
-![Ubuntu 20. LTS Instance](jenkins.png)
+![Ubuntu 20. LTS Instance](/Images/jenkins.PNG)
 `ssh -i "jen-key.pem" ubuntu@ec2-15-228-54-237.sa-east-1.compute.amazonaws.com`
 2. Install JDK
 `sudo apt update`
-![apt updated](apt-update.png)
+![apt updated](/Images/apt-update.PNG)
 `sudo apt install default-jdk-headless`
-![jdk default](jdk.png)
+![jdk default](/Images/jdk.PNG)
 3.Install Jenkins
 
 `wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -`
 `sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'`
 `sudo apt update`
 `sudo apt-get install jenkins`
-![jenkins installed](jenkins-install.png)
+![jenkins installed](/Images/jenkins-install.PNG)
 
 - Make sure Jenkins is up and running
 `sudo systemctl status jenkins`
-![jenkins status](stat.png)
+![jenkins status](/Images/stat.PNG)
 
 5. By default Jenkins server uses TCP port 8080 – open it by creating a new Inbound Rule in your EC2 Security Group
-![Inbound rule](port.png)
+![Inbound rule](/Images/port.PNG)
 
 - Perform initial Jenkins setup.
 
@@ -33,9 +33,9 @@ You will be prompted to provide a default admin password
 or
 `sudo vi /var/lib/jenkins/secrets/initialAdminPassword`
  d84735f4243e4faf8ea684558518804e
-![jenkins logged in](site.png)
+![jenkins logged in](/Images/site.PNG)
 -Setup Username admin and password as above
-![jenkins user setup](setup.png)
+![jenkins user setup](/Images/setup.PNG)
 
 ## Step 2 – Configure Jenkins to retrieve source codes from GitHub using Webhooks
 1. Enable webhooks in your GitHub repository settings
@@ -43,21 +43,21 @@ or
 
 2. Go to Jenkins web console, click "New Item" and create a "Freestyle project"
 -Install Git Server update
-![tooling github linked](git-link.png)
+![tooling github linked](/Images/git-link.PNG)
 
 3. Click "Configure" your job/project and add these two configurations
 Configure triggering the job from GitHub webhook:
 
 
 - Archive the artifact on Post Actions
-![saved and applied](post.png)
+![saved and applied](/Images/post.PNG)
 
 -confirm build
-![confirm update of project in Jenkins](build.png)
+![confirm update of project in Jenkins](/Images/build.PNG)
 
 ## Configure Jenkins to copy files to NFS server via SSH
 1. Install "Publish Over SSH" plugin.
-![Installed Publish over ssh](publish.png)
+![Installed Publish over ssh](/Images/publish.PNG)
 2. Configure the job/project to copy artifacts over to NFS server.
 - On main dashboard select "Manage Jenkins" and choose "Configure System" menu item.
 
@@ -104,30 +104,34 @@ ec2-18-231-189-79.sa-east-1.compute.amazonaws.com
 - Remote directory – /mnt/apps since our Web Servers use it as a mointing point to retrieve files from the NFS server
 
 -Ubuntu do-release-upgrade
+
 `sudo do-release-upgrade`
-![Ubuntu upgrade](do-release-upgrade.png)
+
+![Ubuntu upgrade](/Images/do-release-upgrade.PNG)
+
 -Upgrade complete
-![completed](upgraded.png)
+
+![completed](/Images/upgraded.PNG)
 
 
 Jenkins API Token: 112be6335f77896d074cb7090fae6e05ea
 
 Github ID: bccaf954-498d-4841-98f3-c8e51b81452d
 Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
-![Git APi created](GitApi.png)
+![Git APi created](/Images/GitApi.PNG)
 
-![app setting for tooling-git](tooling-git.png)
+![app setting for tooling-git](/Images/tooling-git.PNG)
 
 -Blocker found
-![error 403 created](blocker.png)
+![error 403 created](/Images/blocker.PNG)
 -Resolved
 1. Launch NFS instance on Rhel 8.
 `ssh -i "nfskey.pem" ec2-user@ec2-52-67-48-33.sa-east-1.compute.amazonaws.com`
-![Rhel 8](rhel-nfs.png)
+![Rhel 8](/Images/rhel-nfs.PNG)
 `lsblk`
-![lsblk run](list.png)
+![lsblk run](/Images/list.PNG)
 `df -h`
-![df -h run](ldf-h1.png)
+![df -h run](/Images/ldf-h1.PNG)
 
 `sudo gdisk /dev/xvdf`
 `sudo gdisk /dev/xvdg`
@@ -135,99 +139,138 @@ Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
 
 -type p -next n with 8e00 -w -y
 `lsblk`
-![lsblk run](newpart.png)
+![lsblk run](/Images/newpart.PNG)
 
 Install lvm2 
 `sudo yum install lvm2`
-![llvm2 run](lvm2-new.png)
+![llvm2 run](/Images/lvm2-new.PNG)
 `sudo lvmdiskscan`
-![lvmdiskscan run](lvmscan.png)
+![lvmdiskscan run](/Images/lvmscan.PNG)
 
 Make  physical volumes
 `sudo pvcreate /dev/xvdf1` 
 `sudo pvcreate /dev/xvdg1` 
 `sudo pvcreate /dev/xvdh1`
 `sudo pvs`
-![pvs run](pvs2.png)
+![pvs run](/Images/pvs2.PNG)
 
 Volume Groups
+
 `sudo vgcreate nfsdata-vg /dev/xvdh1 /dev/xvdg1 /dev/xvdf1`
+
 Verify 
+
 `sudo vgs`
+
 Create
 `sudo lvcreate -n lv-opt -L 14G nfsdata-vg`
+
 `sudo lvcreate -n lv-apps -L 14G nfsdata-vg`
+
 `sudo lvcreate -n lv-logs -L 14G nfsdata-vg`
 
 Confirm Logical volumes 
+
 `sudo lvs`
-![lvs run](lvs2.png)
+
+![lvs run](/Images/lvs2.PNG)
 
 Verify entire setup 
 `sudo vgdisplay -v` #view complete setup - VG, PV, and LV
-![see all](vgdisplay.png)
-![see all](vgdisplay1.png)
-![see all](vgdisplay2.png)
+
+![see all](/Images/vgdisplay.PNG)
+
+![see all](/Images/vgdisplay1.PNG)
+
+![see all](/Images/vgdisplay2.PNG)
 
 Run `lsblk`
-![lsblk run](lsblk3.png)
+![lsblk run](/Images/lsblk3.PNG)
 
 Format the LV with xfs filesystem 
+
 `sudo mkfs -t xfs /dev/nfsdata-vg/lv-opt`
+
 `sudo mkfs -t xfs /dev/nfsdata-vg/lv-apps`
+
 `sudo mkfs -t xfs /dev/nfsdata-vg/lv-logs`
 
 Rename vg nfsdata-vg to webdata-vg 
+
 `sudo vgrename nfsdata-vg webdata-vg`
 
 Make directory
+
 `sudo mkdir /mnt && cd /mnt`
+
 Create /mnt/apps to be used by webservers 
+
 `sudo mkdir -p /mnt/apps` 
 
 Create /mnt/logs to be used by webserver logs 
+
 `sudo mkdir -p /mnt/logs`
 
 Create /mnt/opt to be used by Jenkins server 
+
 `sudo mkdir -p /mnt/opt`
 
 Mount lv-app on /mnt/apps – To be used by webservers 
+
 `sudo mount /dev/webdata-vg/lv-apps /mnt/apps` 
 
-Mount lv-logs on /mnt/logs – To be used by webserver logs 
+Mount lv-logs on /mnt/logs – To be used by webserver logs
+
 `sudo mount /dev/webdata-vg/lv-logs /mnt/logs` 
 
 Mount lv-opt on /mnt/opt – To be used by Jenkins server in Project 8
+
 `sudo mount /dev/webdata-vg/lv-logs /mnt/opt` 
 
 
 Install NFS server, configure it to start on reboot and make sure it is u and running
+
 `sudo yum -y update`
+
 `sudo yum install nfs-utils -y`
-![nfs-utils](yum-ut.png)
+
+![nfs-utils](/Images/yum-ut.PNG)
+
 `sudo systemctl start nfs-server.service` 
+
 `sudo systemctl enable nfs-server.service`
+
 `sudo systemctl status nfs-server.service`
-![nfs- service](nfs-systemctl.png)
+
+![nfs- service](/Images/nfs-systemctl.PNG)
 
 Confirm Subnet link to cidr 
-![cidr](subnet-link.png)
+
+![cidr](/Images/subnet-link.PNG)
 
 Make sure we set up permission that will allow our Web servers to read, write and execute files on NFS:
 
 `sudo chown -R nobody: /mnt/apps `
+
 `sudo chown -R nobody: /mnt/logs` 
+
 `sudo chown -R nobody: /mnt/opt`
 
+
 `sudo chmod -R 777 /mnt/apps` 
-`sudo chmod -R 777 /mnt/logs` 
+
+`sudo chmod -R 777 /mnt/logs`
+
 `sudo chmod -R 777 /mnt/opt`
 
 `sudo systemctl restart nfs-server.service`
 
 Sync 
+
 `sudo rsync /mnt/logs` 
+
 `sudo rsync /mnt/apps` 
+
 `sudo rsync /mnt/opt`
 
 Configure access to NFS for clients within the same subnet (example of Subnet CIDR – 172.31.0.0/20 ):
@@ -235,7 +278,9 @@ Configure access to NFS for clients within the same subnet (example of Subnet CI
 `sudo vi /etc/exports`
 
 /mnt/apps <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash) 
+
 /mnt/logs <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash) 
+
 /mnt/opt <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash)
 
 Esc + :wq!
@@ -243,10 +288,12 @@ Esc + :wq!
 `sudo exportfs -arv`
 
 Check which port is used by NFS and open it using Security Groups (add new Inbound Rule)
-`rpcinfo -p | grep nfs`
-![rpcinfo](rpcinfo.png)
 
-[Jenkins](http://18.230.184.147:8080)
+`rpcinfo -p | grep nfs`
+
+![rpcinfo](/Images/rpcinfo.PNG)
+
+[Jenkins](/Images/http://18.230.184.147:8080)
 
 Modification the job/project to copy artifacts over to NFS server.
 
@@ -269,9 +316,13 @@ Scroll down to Publish over SSH plugin configuration section and configure it to
 In Configure Global Security > CSRF Protection
 Crumb Issuer(Default Crumb Issuer)
 Enable proxy compactibility
-![proxy set](crumb-proxy.png)
+
+![proxy set](/Images/crumb-proxy.PNG)
+
 Publish over ssh done
-![test success](success.png)
+
+![test success](/Images/success.PNG)
 
 `sudo cat /mnt/apps/README.md`
-![access README.md](readme.png)
+
+![access README.md](/Images/readme.PNG)
