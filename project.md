@@ -1,27 +1,27 @@
 # Continuous Integration Pipeline with Jenkins Server
 1. Install and Configure Jenkins
 **Create instance in south africa region**
-![Ubuntu 20. LTS Instance](jenkins.PNG)
+![Ubuntu 20. LTS Instance](/Images/jenkins.PNG)
 `ssh -i "jen-key.pem" ubuntu@ec2-15-228-54-237.sa-east-1.compute.amazonaws.com`
 2. Install JDK
 `sudo apt update`
-![apt updated](apt-update.PNG)
+![apt updated](/Images/apt-update.PNG)
 `sudo apt install default-jdk-headless`
-![jdk default](jdk.PNG)
+![jdk default](/Images/jdk.PNG)
 3.Install Jenkins
 
 `wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -`
 `sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'`
 `sudo apt update`
 `sudo apt-get install jenkins`
-![jenkins installed](jenkins-install.PNG)
+![jenkins installed](/Images/jenkins-install.PNG)
 
 - Make sure Jenkins is up and running
 `sudo systemctl status jenkins`
-![jenkins status](stat.PNG)
+![jenkins status](/Images/stat.PNG)
 
 5. By default Jenkins server uses TCP port 8080 – open it by creating a new Inbound Rule in your EC2 Security Group
-![Inbound rule](port.PNG)
+![Inbound rule](/Images/port.PNG)
 
 - Perform initial Jenkins setup.
 
@@ -33,9 +33,9 @@ You will be prompted to provide a default admin password
 or
 `sudo vi /var/lib/jenkins/secrets/initialAdminPassword`
  d84735f4243e4faf8ea684558518804e
-![jenkins logged in](site.PNG)
+![jenkins logged in](/Images/site.PNG)
 -Setup Username admin and password as above
-![jenkins user setup](setup.PNG)
+![jenkins user setup](/Images/setup.PNG)
 
 ## Step 2 – Configure Jenkins to retrieve source codes from GitHub using Webhooks
 1. Enable webhooks in your GitHub repository settings
@@ -43,21 +43,21 @@ or
 
 2. Go to Jenkins web console, click "New Item" and create a "Freestyle project"
 -Install Git Server update
-![tooling github linked](git-link.PNG)
+![tooling github linked](/Images/git-link.PNG)
 
 3. Click "Configure" your job/project and add these two configurations
 Configure triggering the job from GitHub webhook:
 
 
 - Archive the artifact on Post Actions
-![saved and applied](post.PNG)
+![saved and applied](/Images/post.PNG)
 
 -confirm build
-![confirm update of project in Jenkins](build.PNG)
+![confirm update of project in Jenkins](/Images/build.PNG)
 
 ## Configure Jenkins to copy files to NFS server via SSH
 1. Install "Publish Over SSH" plugin.
-![Installed Publish over ssh](publish.PNG)
+![Installed Publish over ssh](/Images/publish.PNG)
 2. Configure the job/project to copy artifacts over to NFS server.
 - On main dashboard select "Manage Jenkins" and choose "Configure System" menu item.
 
@@ -107,31 +107,31 @@ ec2-18-231-189-79.sa-east-1.compute.amazonaws.com
 
 `sudo do-release-upgrade`
 
-![Ubuntu upgrade](do-release-upgrade.PNG)
+![Ubuntu upgrade](/Images/do-release-upgrade.PNG)
 
 -Upgrade complete
 
-![completed](upgraded.PNG)
+![completed](/Images/upgraded.PNG)
 
 
 Jenkins API Token: 112be6335f77896d074cb7090fae6e05ea
 
 Github ID: bccaf954-498d-4841-98f3-c8e51b81452d
 Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
-![Git APi created](GitApi.PNG)
+![Git APi created](/Images/GitApi.PNG)
 
-![app setting for tooling-git](tooling-git.PNG)
+![app setting for tooling-git](/Images/tooling-git.PNG)
 
 -Blocker found
-![error 403 created](blocker.PNG)
+![error 403 created](/Images/blocker.PNG)
 -Resolved
 1. Launch NFS instance on Rhel 8.
 `ssh -i "nfskey.pem" ec2-user@ec2-52-67-48-33.sa-east-1.compute.amazonaws.com`
-![Rhel 8](rhel-nfs.PNG)
+![Rhel 8](/Images/rhel-nfs.PNG)
 `lsblk`
-![lsblk run](list.PNG)
+![lsblk run](/Images/list.PNG)
 `df -h`
-![df -h run](ldf-h1.PNG)
+![df -h run](/Images/ldf-h1.PNG)
 
 `sudo gdisk /dev/xvdf`
 `sudo gdisk /dev/xvdg`
@@ -139,20 +139,20 @@ Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
 
 -type p -next n with 8e00 -w -y
 `lsblk`
-![lsblk run](newpart.PNG)
+![lsblk run](/Images/newpart.PNG)
 
 Install lvm2 
 `sudo yum install lvm2`
-![llvm2 run](lvm2-new.PNG)
+![llvm2 run](/Images/lvm2-new.PNG)
 `sudo lvmdiskscan`
-![lvmdiskscan run](lvmscan.PNG)
+![lvmdiskscan run](/Images/lvmscan.PNG)
 
 Make  physical volumes
 `sudo pvcreate /dev/xvdf1` 
 `sudo pvcreate /dev/xvdg1` 
 `sudo pvcreate /dev/xvdh1`
 `sudo pvs`
-![pvs run](pvs2.PNG)
+![pvs run](/Images/pvs2.PNG)
 
 Volume Groups
 
@@ -173,19 +173,19 @@ Confirm Logical volumes
 
 `sudo lvs`
 
-![lvs run](lvs2.PNG)
+![lvs run](/Images/lvs2.PNG)
 
 Verify entire setup 
 `sudo vgdisplay -v` #view complete setup - VG, PV, and LV
 
-![see all](vgdisplay.PNG)
+![see all](/Images/vgdisplay.PNG)
 
-![see all](vgdisplay1.PNG)
+![see all](/Images/vgdisplay1.PNG)
 
-![see all](vgdisplay2.PNG)
+![see all](/Images/vgdisplay2.PNG)
 
 Run `lsblk`
-![lsblk run](lsblk3.PNG)
+![lsblk run](/Images/lsblk3.PNG)
 
 Format the LV with xfs filesystem 
 
@@ -234,7 +234,7 @@ Install NFS server, configure it to start on reboot and make sure it is u and ru
 
 `sudo yum install nfs-utils -y`
 
-![nfs-utils](yum-ut.PNG)
+![nfs-utils](/Images/yum-ut.PNG)
 
 `sudo systemctl start nfs-server.service` 
 
@@ -242,11 +242,11 @@ Install NFS server, configure it to start on reboot and make sure it is u and ru
 
 `sudo systemctl status nfs-server.service`
 
-![nfs- service](nfs-systemctl.PNG)
+![nfs- service](/Images/nfs-systemctl.PNG)
 
 Confirm Subnet link to cidr 
 
-![cidr](subnet-link.PNG)
+![cidr](/Images/subnet-link.PNG)
 
 Make sure we set up permission that will allow our Web servers to read, write and execute files on NFS:
 
@@ -291,9 +291,9 @@ Check which port is used by NFS and open it using Security Groups (add new Inbou
 
 `rpcinfo -p | grep nfs`
 
-![rpcinfo](rpcinfo.PNG)
+![rpcinfo](/Images/rpcinfo.PNG)
 
-[Jenkins](http://18.230.184.147:8080)
+[Jenkins](/Images/http://18.230.184.147:8080)
 
 Modification the job/project to copy artifacts over to NFS server.
 
@@ -317,12 +317,12 @@ In Configure Global Security > CSRF Protection
 Crumb Issuer(Default Crumb Issuer)
 Enable proxy compactibility
 
-![proxy set](crumb-proxy.PNG)
+![proxy set](/Images/crumb-proxy.PNG)
 
 Publish over ssh done
 
-![test success](success.PNG)
+![test success](/Images/success.PNG)
 
 `sudo cat /mnt/apps/README.md`
 
-![access README.md](readme.PNG)
+![access README.md](/Images/readme.PNG)
