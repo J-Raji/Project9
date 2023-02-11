@@ -1,20 +1,28 @@
 # Continuous Integration Pipeline with Jenkins Server
 1. Install and Configure Jenkins
+ 
 **Create instance in south africa region**
-![Ubuntu 20. LTS Instance](Images/jenkins.PNG)
+
+![Ubuntu 20. LTS Instance](/jenkins.PNG)
+
 `ssh -i "jen-key.pem" ubuntu@ec2-15-228-54-237.sa-east-1.compute.amazonaws.com`
+
 2. Install JDK
+
 `sudo apt update`
-![apt updated](Images/apt-update.PNG)
+
+![apt updated](/apt-update.PNG)
+
 `sudo apt install default-jdk-headless`
-![jdk default](Images/jdk.PNG)
+![jdk default](/jdk.PNG)
+
 3.Install Jenkins
 
 `wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -`
 `sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'`
 `sudo apt update`
 `sudo apt-get install jenkins`
-![jenkins installed](Images/jenkins-install.PNG)
+![jenkins installed](/jenkins-install.PNG)
 
 - Make sure Jenkins is up and running
 `sudo systemctl status jenkins`
