@@ -1,13 +1,14 @@
 # Continuous Integration Pipeline with Jenkins Server
+
 1. Install and Configure Jenkins
- 
-**Create instance in south africa region**
+
+-Create instance in south africa region
 
 ![Ubuntu 20. LTS Instance](./Images/jenkins.PNG)
 
 `ssh -i "jen-key.pem" ubuntu@ec2-15-228-54-237.sa-east-1.compute.amazonaws.com`
 
-2. Install JDK
+2.Install JDK
 
 `sudo apt update`
 
@@ -24,19 +25,19 @@
 `sudo apt-get install jenkins`
 ![jenkins installed](./Images/jenkins-install.PNG)
 
-- Make sure Jenkins is up and running
+-Make sure Jenkins is up and running
 `sudo systemctl status jenkins`
 ![jenkins status](./Images/stat.PNG)
 
-5. By default Jenkins server uses TCP port 8080 – open it by creating a new Inbound Rule in your EC2 Security Group
+5.By default Jenkins server uses TCP port 8080 – open it by creating a new Inbound Rule in your EC2 Security Group
 ![Inbound rule](./Images/port.PNG)
 
-- Perform initial Jenkins setup.
+-Perform initial Jenkins setup.
 
-From your browser access http://15.228.54.237:8080
+From your browser access [http://15.228.54.237:8080]
 
 You will be prompted to provide a default admin password 
-- Run
+-Run
 `sudo journalctl -u jenkins.service`
 or
 `sudo vi /var/lib/jenkins/secrets/initialAdminPassword`
@@ -49,11 +50,11 @@ or
 1. Enable webhooks in your GitHub repository settings
 [add webhooks](https://github.com/J-Raji/Project9/settings/hooks/397986019)
 
-2. Go to Jenkins web console, click "New Item" and create a "Freestyle project"
+2.Go to Jenkins web console, click "New Item" and create a "Freestyle project"
 -Install Git Server update
 ![tooling github linked](./Images/git-link.PNG)
 
-3. Click "Configure" your job/project and add these two configurations
+3.Click "Configure" your job/project and add these two configurations
 Configure triggering the job from GitHub webhook:
 
 
@@ -64,15 +65,16 @@ Configure triggering the job from GitHub webhook:
 ![confirm update of project in Jenkins](./Images/build.PNG)
 
 ## Configure Jenkins to copy files to NFS server via SSH
-1. Install "Publish Over SSH" plugin.
+
+1.Install "Publish Over SSH" plugin.
 ![Installed Publish over ssh](./Images/publish.PNG)
-2. Configure the job/project to copy artifacts over to NFS server.
-- On main dashboard select "Manage Jenkins" and choose "Configure System" menu item.
+2.Configure the job/project to copy artifacts over to NFS server.
+-On main dashboard select "Manage Jenkins" and choose "Configure System" menu item.
 
 Scroll down to Publish over SSH plugin configuration section and configure it to be able to connect to your NFS server:
 `ssh -i "Nfs-key.pem" ec2-user@ec2-18-231-189-79.sa-east-1.compute.amazonaws.com`
 
-- Provide a private key (content of .pem file that you use to connect to NFS server via SSH/Putty)
+-Provide a private key (content of .pem file that you use to connect to NFS server via SSH/Putty)
     -----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEAj5I0zT2hb4GLTgOncL3sDwsg0EdGtzZgDc1cELwc8eWpaxtZ
 nBqKqGcRHKKcqh+vv4dU+USbzLDhzI8M2HkMKhDouE8/hwpFGcGMLa+sqtJ7LYUA
@@ -101,15 +103,14 @@ VtRmorkCgYEAucjWGqTIZG5qa2VoK38KnstopJbMwC3QNWSmJP9nxy+g3Xdy2AzI
 UYCDSarZv1a4DvD8EsG4O1KMgLDbYoC4XOFNLFDziaOkCU4IPjsAA5A=
 -----END RSA PRIVATE KEY-----
 
-- Arbitrary name
+-Arbitrary name
 ec2-18-231-189-79.sa-east-1.compute.amazonaws.com
 
-- Hostname – can be private IP address of your NFS server
+-Hostname – can be private IP address of your NFS server
 172.31.38.44
 
-- Username – ec2-user (since NFS server is based on EC2 with RHEL 8)
-    
-- Remote directory – /mnt/apps since our Web Servers use it as a mointing point to retrieve files from the NFS server
+-Username – ec2-user (since NFS server is based on EC2 with RHEL 8
+-Remote directory – /mnt/apps since our Web Servers use it as a mointing point to retrieve files from the NFS server
 
 -Ubuntu do-release-upgrade
 
@@ -120,7 +121,6 @@ ec2-18-231-189-79.sa-east-1.compute.amazonaws.com
 -Upgrade complete
 
 ![completed](./Images/upgraded.PNG)
-
 
 Jenkins API Token: 112be6335f77896d074cb7090fae6e05ea
 
@@ -133,7 +133,7 @@ Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
 -Blocker found
 ![error 403 created](./Images/blocker.PNG)
 -Resolved
-1. Launch NFS instance on Rhel 8.
+1.Launch NFS instance on Rhel 8.
 `ssh -i "nfskey.pem" ec2-user@ec2-52-67-48-33.sa-east-1.compute.amazonaws.com`
 ![Rhel 8](./Images/rhel-nfs.PNG)
 `lsblk`
@@ -149,35 +149,35 @@ Client Key: 2d618aa183d799f3775a0193309841fc83b128c8
 `lsblk`
 ![lsblk run](./Images/newpart.PNG)
 
-Install lvm2 
+-Install lvm2 
 `sudo yum install lvm2`
 ![llvm2 run](./Images/lvm2-new.PNG)
 `sudo lvmdiskscan`
 ![lvmdiskscan run](./Images/lvmscan.PNG)
 
-Make  physical volumes
+-Make  physical volumes
 `sudo pvcreate /dev/xvdf1` 
 `sudo pvcreate /dev/xvdg1` 
 `sudo pvcreate /dev/xvdh1`
 `sudo pvs`
 ![pvs run](./Images/pvs2.PNG)
 
-Volume Groups
+-Volume Groups
 
 `sudo vgcreate nfsdata-vg /dev/xvdh1 /dev/xvdg1 /dev/xvdf1`
 
-Verify 
+-Verify
 
 `sudo vgs`
 
-Create
+-Create
 `sudo lvcreate -n lv-opt -L 14G nfsdata-vg`
 
 `sudo lvcreate -n lv-apps -L 14G nfsdata-vg`
 
 `sudo lvcreate -n lv-logs -L 14G nfsdata-vg`
 
-Confirm Logical volumes 
+-Confirm Logical volumes
 
 `sudo lvs`
 
@@ -192,10 +192,10 @@ Verify entire setup
 
 ![see all](./Images/vgdisplay2.PNG)
 
-Run `lsblk`
+-Run `lsblk`
 ![lsblk run](./Images/lsblk3.PNG)
 
-Format the LV with xfs filesystem 
+-Format the LV with xfs filesystem
 
 `sudo mkfs -t xfs /dev/nfsdata-vg/lv-opt`
 
@@ -203,40 +203,39 @@ Format the LV with xfs filesystem
 
 `sudo mkfs -t xfs /dev/nfsdata-vg/lv-logs`
 
-Rename vg nfsdata-vg to webdata-vg 
+-Rename vg nfsdata-vg to webdata-vg
 
 `sudo vgrename nfsdata-vg webdata-vg`
 
-Make directory
+-Make directory
 
 `sudo mkdir /mnt && cd /mnt`
 
-Create /mnt/apps to be used by webservers 
+-Create /mnt/apps to be used by webservers
 
-`sudo mkdir -p /mnt/apps` 
+`sudo mkdir -p /mnt/apps`
 
-Create /mnt/logs to be used by webserver logs 
+Create /mnt/logs to be used by webserver logs
 
 `sudo mkdir -p /mnt/logs`
 
-Create /mnt/opt to be used by Jenkins server 
+-Create /mnt/opt to be used by Jenkins server
 
 `sudo mkdir -p /mnt/opt`
 
-Mount lv-app on /mnt/apps – To be used by webservers 
+-Mount lv-app on /mnt/apps – To be used by webservers
 
-`sudo mount /dev/webdata-vg/lv-apps /mnt/apps` 
+`sudo mount /dev/webdata-vg/lv-apps /mnt/apps`
 
-Mount lv-logs on /mnt/logs – To be used by webserver logs
+-Mount lv-logs on /mnt/logs – To be used by webserver logs
 
-`sudo mount /dev/webdata-vg/lv-logs /mnt/logs` 
+`sudo mount /dev/webdata-vg/lv-logs /mnt/logs`
 
 Mount lv-opt on /mnt/opt – To be used by Jenkins server in Project 8
 
-`sudo mount /dev/webdata-vg/lv-logs /mnt/opt` 
+`sudo mount /dev/webdata-vg/lv-logs /mnt/opt`
 
-
-Install NFS server, configure it to start on reboot and make sure it is u and running
+-Install NFS server, configure it to start on reboot and make sure it is u and running
 
 `sudo yum -y update`
 
@@ -252,20 +251,20 @@ Install NFS server, configure it to start on reboot and make sure it is u and ru
 
 ![nfs- service](./Images/nfs-systemctl.PNG)
 
-Confirm Subnet link to cidr 
+-Confirm Subnet link to cidr
 
 ![cidr](./Images/subnet-link.PNG)
 
-Make sure we set up permission that will allow our Web servers to read, write and execute files on NFS:
+-Make sure we set up permission that will allow our Web servers to read, write and execute files on NFS:
 
-`sudo chown -R nobody: /mnt/apps `
+`sudo chown -R nobody: /mnt/apps`
 
-`sudo chown -R nobody: /mnt/logs` 
+`sudo chown -R nobody: /mnt/logs`
 
 `sudo chown -R nobody: /mnt/opt`
 
 
-`sudo chmod -R 777 /mnt/apps` 
+`sudo chmod -R 777 /mnt/apps`
 
 `sudo chmod -R 777 /mnt/logs`
 
@@ -273,21 +272,21 @@ Make sure we set up permission that will allow our Web servers to read, write an
 
 `sudo systemctl restart nfs-server.service`
 
-Sync 
+-Sync
 
-`sudo rsync /mnt/logs` 
+`sudo rsync /mnt/logs`
 
-`sudo rsync /mnt/apps` 
+`sudo rsync /mnt/apps`
 
 `sudo rsync /mnt/opt`
 
-Configure access to NFS for clients within the same subnet (example of Subnet CIDR – 172.31.0.0/20 ):
+-Configure access to NFS for clients within the same subnet (example of Subnet CIDR – 172.31.0.0/20 ):
 
 `sudo vi /etc/exports`
 
-/mnt/apps <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash) 
+/mnt/apps <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash)
 
-/mnt/logs <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash) 
+/mnt/logs <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash)
 
 /mnt/opt <Subnet-172.31.0.0/20>(rw,sync,no_all_squash,no_root_squash)
 
